@@ -8,7 +8,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
 import Animated from "react-native-reanimated";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableOpacity } from "react-native";
 
 export default function WelcomeScreen() {
     const animation = useRef(null);
@@ -53,8 +53,23 @@ export default function WelcomeScreen() {
             </View>
 
             <View>
-                <TouchableOpacity>
-                    <Text> Get Started </Text>
+                <TouchableOpacity
+                    style={{
+                        backgroundColor:"#fff",
+                        paddingVertical: hp(1.5),
+                        paddingHorizontal: hp(5),
+                        borderRadius: hp(1.5),
+                    }}
+                    onPress={() => navigation.navigate("Home")}
+                >
+                    <Text
+                        style={{
+                            color:"#f64e32",
+                            fontSize: hp(2.2),
+                            fontWeight: "medium",
+                        }}
+                    > 
+                    Get Started </Text>
                 </TouchableOpacity>
             </View>
         </View >
