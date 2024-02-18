@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, SafeAreaView, Image} from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     MagnifyingGlassIcon,
     AdjustmentsHorizontalIcon,
@@ -7,8 +7,49 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { heightPercentageToDP as hp} from "react-native-responsive-screen";
 import { TextInput } from "react-native";
+import Categories from "../component/Categories";
+import axios from "axios";
 
 export default function HomeScreen() {
+    const [activeCategory, setActiveCategory] = useState("Beef");
+    const [categories, setCategories] = useState([]);
+    const [meals, setMeals] = useState([]);
+
+    useEffect(() => {
+        getCategories();
+        getRecipes();
+    }, []);
+
+    const handleChangeCategory = (category) => {
+        getRecipes(category);
+        setActiveCategory(category);
+        setMeals([]);
+    };
+
+    const getCategories = async () => {
+        try {
+            const response = await axios.get(
+                "https://www.themeldb.com/api/json/v1/1/categories.php"
+            );
+            if (response && response.data) {
+                setCategories(response.data.categories);
+                console.log(response.data.categories);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    };  
+
+    const getRecipes = async (category = "Beef") => {
+        try {
+            const response = await axios.get(
+                `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`
+            )
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
     return (
         <View className="flex-1 bg-white">
             <StatusBar style="dark" />
@@ -67,7 +108,17 @@ export default function HomeScreen() {
                              className="flex-1 text-base mb-1 pl-1 tracking-widest" 
                          />
                     </View>
-                   
+
+                    {/* Categories */}
+                    <View>
+                         {Categories.length > 0 && (
+                           <Categories 
+                               categories={categories}
+                               activeCategory={activeCategory}
+                               handleChangeCategory={handleChangeCategory}
+                            />
+                        )}                        
+                    </View>                 
                 </ScrollView>
             </SafeAreaView>
         </View>
