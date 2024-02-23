@@ -9,6 +9,8 @@ import { heightPercentageToDP as hp} from "react-native-responsive-screen";
 import { TextInput } from "react-native";
 import Categories from "../component/Categories";
 import axios from "axios";
+import Recipes from "../component/Recipes";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function HomeScreen() {
     const [activeCategory, setActiveCategory] = useState("Beef");
@@ -29,7 +31,7 @@ export default function HomeScreen() {
     const getCategories = async () => {
         try {
             const response = await axios.get(
-                "https://www.themeldb.com/api/json/v1/1/categories.php"
+                "https://www.themealdb.com/api/json/v1/1/categories.php"
             );
             if (response && response.data) {
                 setCategories(response.data.categories);
@@ -44,11 +46,14 @@ export default function HomeScreen() {
         try {
             const response = await axios.get(
                 `https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`
-            )
+        );
+        if(response && response.data) {
+            setMeals(response.data.meals);
+        }
         } catch (error) {
             console.log(error.message);
         }
-    }
+    };
 
     return (
         <View className="flex-1 bg-white">
@@ -118,7 +123,13 @@ export default function HomeScreen() {
                                handleChangeCategory={handleChangeCategory}
                             />
                         )}                        
-                    </View>                 
+                    </View>     
+
+                    {/* Recipes Meal */}  
+                    <View>
+                        <Recipes meals={meals} categories={categories}/>
+                    </View> 
+
                 </ScrollView>
             </SafeAreaView>
         </View>
