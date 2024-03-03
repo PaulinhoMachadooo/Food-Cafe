@@ -10,19 +10,24 @@ import {
 import { TouchableOpacity } from "react-native";
 import { ChevronLeftIcon } from "react-native-heroicons/outline";
 import { HeartIcon } from "react-native-heroicons/solid";
-import HomeScreen from "./HomeScreen";
+import Loading from "../component/Loading";
+import axios from "axios";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 
 export default function RecipeDetailsScreen(props) {
     let item = props.route.params;
     const navigation = useNavigation;
     const [meal, setMeal] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const [isFavourite, setFavourite] = useState(false);
+
+    console.log("Meal",meal);
 
     useEffect(() => {
         getMealData(item.idMeal);
     });
+
 
     const getMealData = async (id) => {
         try{
@@ -33,7 +38,7 @@ export default function RecipeDetailsScreen(props) {
 
             if (response && response.data) {
                 setMeal(response.data.meals[0]);
-                setLoading(false);
+                setIsLoading(false);
             }
 
         } catch (error) {
@@ -50,11 +55,13 @@ export default function RecipeDetailsScreen(props) {
                 indexes.push(i);
             }          
         }
+
+        return indexes;
     };
 
     return (      
         <ScrollView
-            className="flex-1"
+            className="flex-1 bg-white"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
                 paddingBottom: 30,
@@ -78,24 +85,147 @@ export default function RecipeDetailsScreen(props) {
             { /* Back Button and Favorite Icon */ }
 
             <View className="w-full absolute flex-row justify-between items-center pt-10">
-                <TouchableOpacity
-                    className="p-2 rounded-full bg-white ml-5"
-                    onPress={() => navigation.goBack()}
-                >
-                    <ChevronLeftIcon size={hp(3.5)} color={"#f64e32"} strokeWidth={4.5} />
-                </TouchableOpacity>
+                <View className="p-2 rounded-full bg-white ml-5">
+                    <TouchableOpacity                    
+                        onPress={() => navigation.goBack()}
+                    >
+                        <ChevronLeftIcon size={hp(3.5)} color={"#f64e32"} strokeWidth={4.5} />
+                    </TouchableOpacity>
+                </View>
 
-                <TouchableOpacity
-                    onPress={() => setFavourite(!isFavourite)}
-                    className="p-2 rounded-full bg-white mr-5"
-                >
-                    <HeartIcon 
-                    size={hp(3.5)} 
-                    color={isFavourite ? "#f64e32" : "gray"} 
-                    strokeWidth={4.5} />
-                </TouchableOpacity>
+                <View className="p-2 rounded-full bg-white mr-5">
+                    <TouchableOpacity
+                        onPress={() => setFavourite(!isFavourite)}                       
+                    >
+                        <HeartIcon 
+                        size={hp(3.5)} 
+                        color={isFavourite ? "#f64e32" : "gray"} 
+                        strokeWidth={4.5} />
+                    </TouchableOpacity>
+                </View>
             </View>
-            <Text>RecipeDetailsScreen</Text>
-        </ScrollView>
+
+            {/* Meal Description*/}
+
+            {
+                isLoading ? (
+                   <Loading size="large" className="mt-16" /> 
+                ) : (
+                    <View
+                        className="px-4 flex justify-between space-y-4 bg-white mt-[-46]"
+                        style={{
+                            borderTopLeftRadius: 50,
+                            borderTopRightRadius: 50,
+                            paddingTop: hp(3),
+                        }}
+                    >
+                        {/* Meal Name */}    
+                        <Animated.View 
+                            className="space-y-2 px-4"
+                            entering={FadeInDown.delay(200)
+                                .duration(700)
+                                .springify()
+                                .damping(12)}
+                            >
+                            <Text 
+                                className="font-bold flex-1 text-neutral-700"
+                                style={{
+                                    fontSize: hp(3)
+                                }}
+                            >
+                                {meal?.strMeal}
+                            </Text>
+
+                            <Text
+                                 style={{
+                                    fontSize: hp(2),
+                                }}
+                                className="text-neutral-500 font-medium"
+                            >
+                                {meal?.strArea}
+                            </Text>
+                        </Animated.View>
+
+                        {/* Ingredients */}
+
+                        <Animated.View  
+                            className="space-y-4 p-4"
+                            entering={FadeInDown.delay(300)
+                                .duration(700)
+                                .springify()
+                                .damping(12)}
+                            >
+                            <Text
+                                style={{
+                                    fontSize: hp(2.5),
+                                }}
+                                className="font-bold flex-1 text-neutral-700"
+                            >Ingredients
+                            </Text>
+                            
+                            <View className="space-y-2 ml-3">
+                                {ingredientsIndexes(meal).map((i) => {
+                                        return (
+                                            <View className="flex-row space-x-4 items-center" key={i}>
+                                                <View className="bg-[#f64e32] rounded-full"
+                                                style={{
+                                                    height: hp(1.5),
+                                                    width: hp(1.5),
+                                                }}
+                                                />
+                                                    <View className="flex-row space-x-2">
+                                                        <Text
+                                                            style={{
+                                                                fontSize: hp(1.7),
+                                                            }}
+                                                            className="font-medium text-neutral-800">
+                                                            {meal["strIngredient" + i]}
+                                                        </Text>
+                                                        <Text 
+                                                            className="font-extrabold text-neutral-700"
+                                                            style={{
+                                                                fontSize: hp(1.7),
+                                                            }}
+                                                            >
+                                                            {meal["strMeasure" + i]}
+                                                        </Text>
+                                                    </View>                                                
+                                            </View>
+                                        );
+                                    })}
+                            </View>
+                        </Animated.View >
+
+                        {/* Istructions */}
+
+                        <Animated.View  
+                            className="space-y-4 p-4"
+                            entering={FadeInDown.delay(400)
+                                .duration(700)
+                                .springify()
+                                .damping(12)}
+                            >
+                            <Text 
+                                className="font-bold flex-1 text-neutral-700"
+                                style={{
+                                    fontSize: hp(2.5),
+                                }}
+                            >
+                                Istructions
+                            </Text>
+
+                            <Text
+                                className="text-neutral-700"
+                                style={{
+                                    fontSize: hp(1.7),
+                                }}
+                            >
+                                {meal.strInstructions}
+                            </Text>
+                        </Animated.View >
+
+                    </View>
+                )}
+            </ScrollView>
     );
 }
