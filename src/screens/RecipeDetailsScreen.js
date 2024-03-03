@@ -1,5 +1,5 @@
 import { View, Text , ScrollView, Image} from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { CachedImage } from "../../utils/index";
 import { useNavigation } from "@react-navigation/native";
@@ -17,7 +17,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 export default function RecipeDetailsScreen(props) {
     let item = props.route.params;
-    const navigation = useNavigation;
+    const navigation = useNavigation();
     const [meal, setMeal] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isFavourite, setFavourite] = useState(false);
@@ -86,10 +86,12 @@ export default function RecipeDetailsScreen(props) {
 
             <View className="w-full absolute flex-row justify-between items-center pt-10">
                 <View className="p-2 rounded-full bg-white ml-5">
-                    <TouchableOpacity                    
-                        onPress={() => navigation.goBack()}
-                    >
-                        <ChevronLeftIcon size={hp(3.5)} color={"#f64e32"} strokeWidth={4.5} />
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <ChevronLeftIcon 
+                        size={hp(3.5)} 
+                        color={"#f64e32"} 
+                        strokeWidth={4.5} 
+                    />
                     </TouchableOpacity>
                 </View>
 
